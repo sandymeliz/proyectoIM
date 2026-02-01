@@ -243,20 +243,21 @@ costos_base = {
     'Interno_Rotativo': 8300  
 }
 
+# Planta ratificada (Nombramientos + Contratos Ocasionales estimados 2019)
 planta = {
     'Primer_Nivel': {
-        'Medico_Especialista': 8,
-        'Medico_General': 95,
+        'Medico_Especialista': 12,
+        'Medico_General': 140,  # Subimos para cubrir centros tipo C
         'Interno_Rotativo': 0
     },
     'Segundo_Nivel': {
-        'Medico_Especialista': 45,
-        'Medico_General': 30,
+        'Medico_Especialista': 60,
+        'Medico_General': 45,
         'Interno_Rotativo': 0
     },
     'Tercer_Nivel': {
-        'Medico_Especialista': 400,
-        'Medico_General': 85,
+        'Medico_Especialista': 420, # Dato real aproximado del HCAM 2019
+        'Medico_General': 120,      # Médicos residentes asistenciales
         'Interno_Rotativo': 0
     }
 }
