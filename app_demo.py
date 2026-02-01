@@ -281,9 +281,6 @@ demanda_base = {
 
 # --- 2. MOTOR DE OPTIMIZACIÓN ---
 def resolver_sistema(presupuesto, alpha, f_dem, f_esp, f_gen, f_int):
-    # ----------------------------
-    # MODELO MILP con PuLP (DEMO)
-    # ----------------------------
     prob = LpProblem("Hosp_Opt_PuLP", LpMinimize)
 
     # Costos ajustados
@@ -293,19 +290,24 @@ def resolver_sistema(presupuesto, alpha, f_dem, f_esp, f_gen, f_int):
         'Interno_Rotativo': costos_base['Interno_Rotativo'] * f_int
     }
 
-    # Variables
+    # [NUEVO] CALCULAR COSTO FIJO DE LA PLANTA ACTUAL
+    costo_planta_fijo = sum(
+        planta[j][i] * c_act[i] 
+        for j in niveles for i in perfiles if i != 'Interno_Rotativo'
+    )
+
+    # Variables (Contrataciones nuevas)
     x = {(i, j): LpVariable(f"x_{i}_{j}", lowBound=0, cat=LpInteger)
          for j in niveles for i in perfiles if i != 'Interno_Rotativo'}
-
     y = {j: LpVariable(f"y_{j}", lowBound=0, cat=LpInteger) for j in niveles}
 
-    # Función objetivo
+    # [NUEVO] FUNCIÓN OBJETIVO: Costo Fijo + Costo Variable (Solo minimizamos el variable)
     prob += (
         lpSum(c_act[i] * x[(i, j)] for j in niveles for i in perfiles if i != 'Interno_Rotativo') +
         lpSum(c_act['Interno_Rotativo'] * y[j] for j in niveles)
     )
 
-    # Restricciones de cobertura
+    # Restricciones de cobertura (se mantienen igual)
     for j in niveles:
         for i in perfiles:
             d_ajust = demanda_base[j][i] * f_dem
@@ -314,22 +316,23 @@ def resolver_sistema(presupuesto, alpha, f_dem, f_esp, f_gen, f_int):
             else:
                 prob += capacidad_base[i] * y[j] >= d_ajust
 
-        # Supervisión de internos
         prob += y[j] <= alpha * lpSum(planta[j][i] + x[(i, j)]
                                       for i in perfiles if i != 'Interno_Rotativo')
 
-    # Presupuesto
+    # [NUEVO] RESTRICCIÓN PRESUPUESTARIA INTEGRAL (Planta + Nuevos <= Presupuesto)
     prob += (
+        costo_planta_fijo +
         lpSum(c_act[i] * x[(i, j)] for j in niveles for i in perfiles if i != 'Interno_Rotativo') +
         lpSum(c_act['Interno_Rotativo'] * y[j] for j in niveles)
     ) <= presupuesto
 
-
-    # Resolver
     prob.solve()
 
     if prob.status != LpStatusOptimal:
         return False, None, None, None
+
+    # [NUEVO] COSTO TOTAL REAL (Lo que ya se gasta + lo nuevo)
+    costo_total_real = costo_planta_fijo + value(prob.objective)
 
     # Resultados
     res = []
@@ -370,7 +373,7 @@ def resolver_sistema(presupuesto, alpha, f_dem, f_esp, f_gen, f_int):
     })
 
     costo_total = value(prob.objective)
-    return True, costo_total, df_res, df_pie
+    return True, costo_total_real, df_res, df_pie
 
 
 # --- 3. INTERFAZ ---
@@ -505,11 +508,18 @@ exito, costo, df_res, df_pie = resolver_sistema(pres_val, alpha_val, f_dem, f_es
 
 if exito and costo <= pres_val:
     # KPIs
+    
     k1, k2, k3, k4 = st.columns(4)
-    k1.metric("💵 Gasto Total", f"${costo:,.2f}", f"{(costo/pres_val)*100:.1f}% presupuesto")
-    k2.metric("💰 Ahorro Fiscal", f"${pres_val - costo:,.2f}", "Eficiencia")
+    #k1.metric("💵 Gasto Total", f"${costo:,.2f}", f"{(costo/pres_val)*100:.1f}% presupuesto")
+    #2.metric("💰 Ahorro Fiscal", f"${pres_val - costo:,.2f}", "Eficiencia")
+    #k3.metric("📊 Presupuesto Usado", f"{(costo/pres_val)*100:.1f}%", "Óptimo")
+    #k4.metric("👥 Personal Ocasional", f"{int(df_res['Ocasional'].sum())}", "Profesionales")
+
+    # [NUEVO] K1 ahora muestra el gasto real total
+    k1.metric("💵 Gasto Total", f"${costo:,.2f}", f"{(costo/pres_val)*100:.1f}% del presupuesto")
+    k2.metric("💰 Ahorro Fiscal", f"${pres_val - costo:,.2f}", "Ahorro")
     k3.metric("📊 Presupuesto Usado", f"{(costo/pres_val)*100:.1f}%", "Óptimo")
-    k4.metric("👥 Personal Ocasional", f"{int(df_res['Ocasional'].sum())}", "Profesionales")
+    k4.metric("👥 Personal Ocasional", f"{int(df_res['Ocasional'].sum())}", "Nuevos contratos")
 
     st.divider()
 
