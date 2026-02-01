@@ -284,7 +284,11 @@ def resolver_sistema(presupuesto, alpha, f_dem, f_esp, f_gen, f_int):
                                       for i in perfiles if i != 'Interno_Rotativo')
 
     # Presupuesto
-    prob += value(prob.objective) <= presupuesto
+    prob += (
+        lpSum(c_act[i] * x[(i, j)] for j in niveles for i in perfiles if i != 'Interno_Rotativo') +
+        lpSum(c_act['Interno_Rotativo'] * y[j] for j in niveles)
+    ) <= presupuesto
+
 
     # Resolver
     prob.solve()
