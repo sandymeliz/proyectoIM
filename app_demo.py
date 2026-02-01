@@ -484,7 +484,14 @@ st.divider()
 
 # Barra Lateral
 st.sidebar.header("🕹️ Controles de Sensibilidad")
-pres_val = st.sidebar.number_input("💰 Presupuesto (USD)", 1000000, 5000000, 2500000, step=50000)
+pres_val = st.sidebar.number_input(
+    "💰 Presupuesto Partida 51 - Personal (USD)", 
+    min_value=50000000,    # Mínimo 50 Millones (operación crítica)
+    max_value=200000000,   # Máximo 200 Millones (expansión total)
+    value=115000000,       # Valor referencial basado en 2019/2025
+    step=1000000,          # Saltos de 1 Millón para facilitar el ajuste
+    help="Presupuesto anual estimado para salarios, décimos y aportes patronales."
+)
 f_dem = st.sidebar.slider("📈 Variación Demanda", 0.5, 2.0, 1.0, 0.1)
 alpha_val = st.sidebar.slider("👥 Ratio Alpha", 1, 10, 4)
 
