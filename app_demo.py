@@ -231,17 +231,51 @@ st.markdown("""
 perfiles = ['Medico_Especialista', 'Medico_General', 'Interno_Rotativo']
 niveles = ['Primer_Nivel', 'Segundo_Nivel', 'Tercer_Nivel']
 
-capacidad_base = {'Medico_Especialista': 1680, 'Medico_General': 1680, 'Interno_Rotativo': 1440}
-costos_base = {'Medico_Especialista': 45000, 'Medico_General': 30000, 'Interno_Rotativo': 9600}
+capacidad_base = {
+    'Medico_Especialista': 1500,    # Menos horas asistenciales por docencia
+    'Medico_General': 1680,         
+    'Interno_Rotativo': 1900        # Jornadas extendidas de internado (guardias)
+}
+
+costos_base = {
+    'Medico_Especialista': 41500,    
+    'Medico_General': 26400,        
+    'Interno_Rotativo': 8300  
+}
+
 planta = {
-    'Primer_Nivel': {'Medico_Especialista': 2, 'Medico_General': 15, 'Interno_Rotativo': 0},
-    'Segundo_Nivel': {'Medico_Especialista': 10, 'Medico_General': 8, 'Interno_Rotativo': 0},
-    'Tercer_Nivel': {'Medico_Especialista': 18, 'Medico_General': 5, 'Interno_Rotativo': 0}
+    'Primer_Nivel': {
+        'Medico_Especialista': 8,
+        'Medico_General': 95,
+        'Interno_Rotativo': 0
+    },
+    'Segundo_Nivel': {
+        'Medico_Especialista': 45,
+        'Medico_General': 30,
+        'Interno_Rotativo': 0
+    },
+    'Tercer_Nivel': {
+        'Medico_Especialista': 295,
+        'Medico_General': 85,
+        'Interno_Rotativo': 0
+    }
 }
 demanda_base = {
-    'Primer_Nivel': {'Medico_Especialista': 8500, 'Medico_General': 45000, 'Interno_Rotativo': 12000},
-    'Segundo_Nivel': {'Medico_Especialista': 35000, 'Medico_General': 25000, 'Interno_Rotativo': 15000},
-    'Tercer_Nivel': {'Medico_Especialista': 52000, 'Medico_General': 18000, 'Interno_Rotativo': 20000}
+    'Primer_Nivel': { # Centros tipo A, B y C
+        'Medico_Especialista': 12000,   # Interconsultas programadas
+        'Medico_General': 180000,       # Gran volumen de prevención y consulta básica
+        'Interno_Rotativo': 45000       # Apoyo en atención primaria
+    },
+    'Segundo_Nivel': { # Hospitales del Día / Básicos
+        'Medico_Especialista': 85000,   # Especialidades clínicas básicas
+        'Medico_General': 60000,        # Emergencias y triaje
+        'Interno_Rotativo': 30000       # Guardias y apoyo  
+    },
+    'Tercer_Nivel': { # Hospital de Especialidades HCAM
+        'Medico_Especialista': 450000,  # Foco principal del HCAM (Alta complejidad)
+        'Medico_General': 95000,        # Residentes y apoyo en áreas críticas
+        'Interno_Rotativo': 180000      # Mayor carga docente 
+    }
 }
 
 # --- 2. MOTOR DE OPTIMIZACIÓN ---
