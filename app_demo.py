@@ -255,7 +255,7 @@ planta = {
         'Interno_Rotativo': 0
     },
     'Tercer_Nivel': {
-        'Medico_Especialista': 295,
+        'Medico_Especialista': 400,
         'Medico_General': 85,
         'Interno_Rotativo': 0
     }
