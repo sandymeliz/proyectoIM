@@ -486,9 +486,9 @@ st.divider()
 st.sidebar.header("🕹️ Controles de Sensibilidad")
 pres_val = st.sidebar.number_input(
     "💰 Presupuesto Partida 51 - Personal (USD)", 
-    min_value=50000000,    # Mínimo 50 Millones (operación crítica)
-    max_value=200000000,   # Máximo 200 Millones (expansión total)
-    value=115000000,       # Valor referencial basado en 2019/2025
+    min_value=2500000,    # Mínimo 50 Millones (operación crítica)
+    max_value=120000000,   # Máximo 200 Millones (expansión total)
+    value=30000000,       # Valor referencial basado en 2019/2025
     step=1000000,          # Saltos de 1 Millón para facilitar el ajuste
     help="Presupuesto anual estimado para salarios, décimos y aportes patronales."
 )
