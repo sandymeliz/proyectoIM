@@ -10,7 +10,7 @@ sin solver de optimización, desarrollada únicamente con fines de visualizació
 y análisis interactivo.
 
 ### Versión REAL (Gurobi)
-La versión completa del modelo (`app_real.py`) requiere:
+La versión completa del modelo (`app.py`) requiere:
 - Licencia académica Gurobi
 - Ejecución local o en servidor autorizado
 
