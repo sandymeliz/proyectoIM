@@ -508,14 +508,7 @@ exito, costo, df_res, df_pie = resolver_sistema(pres_val, alpha_val, f_dem, f_es
 
 if exito and costo <= pres_val:
     # KPIs
-    
     k1, k2, k3, k4 = st.columns(4)
-    #k1.metric("💵 Gasto Total", f"${costo:,.2f}", f"{(costo/pres_val)*100:.1f}% presupuesto")
-    #2.metric("💰 Ahorro Fiscal", f"${pres_val - costo:,.2f}", "Eficiencia")
-    #k3.metric("📊 Presupuesto Usado", f"{(costo/pres_val)*100:.1f}%", "Óptimo")
-    #k4.metric("👥 Personal Ocasional", f"{int(df_res['Ocasional'].sum())}", "Profesionales")
-
-    # [NUEVO] K1 ahora muestra el gasto real total
     k1.metric("💵 Gasto Total", f"${costo:,.2f}", f"{(costo/pres_val)*100:.1f}% del presupuesto")
     k2.metric("💰 Ahorro Fiscal", f"${pres_val - costo:,.2f}", "Ahorro")
     k3.metric("📊 Presupuesto Usado", f"{(costo/pres_val)*100:.1f}%", "Óptimo")
@@ -646,7 +639,7 @@ if exito and costo <= pres_val:
         col1, col2 = st.columns([2, 1])
         with col1:
             sens_pres = []
-            for pres_t in np.linspace(1500000, 4000000, 11):
+            for pres_t in np.linspace(25000000, 60000000, 11):
                 ok, c_s, _, _ = resolver_sistema(pres_t, alpha_val, f_dem, f_esp, f_gen, f_int)
                 if ok:
                     sens_pres.append({'Presupuesto': pres_t, 'Costo': c_s})
