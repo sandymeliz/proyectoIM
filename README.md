@@ -6,7 +6,7 @@ comercial Gurobi.
 
 ### Versión DEMO (Pública)
 La versión disponible en línea corresponde a una versión demostrativa
-sin solver de optimización, desarrollada únicamente con fines de visualización
+haciendo uso de Pulp(un solver gratuito), desarrollada únicamente con fines de visualización
 y análisis interactivo.
 
 ### Versión REAL (Gurobi)
@@ -14,4 +14,3 @@ La versión completa del modelo (`app.py`) requiere:
 - Licencia académica Gurobi
 - Ejecución local o en servidor autorizado
 
-Se adjunta evidencia audiovisual del correcto funcionamiento del modelo real.
