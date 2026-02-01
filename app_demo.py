@@ -3,6 +3,9 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
+from pulp import (
+    LpProblem, LpMinimize, LpVariable, lpSum, LpInteger, LpStatusOptimal, value
+)
 
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(
@@ -243,38 +246,93 @@ demanda_base = {
 
 # --- 2. MOTOR DE OPTIMIZACIÓN ---
 def resolver_sistema(presupuesto, alpha, f_dem, f_esp, f_gen, f_int):
-    # ⚠️ Versión DEMO – no usa Gurobi
-    data = []
-    for nivel in niveles:
-        for perfil in perfiles:
-            planta_val = planta[nivel][perfil] if perfil != 'Interno_Rotativo' else 0
-            ocasional = int(max(0, f_dem * 2))  # valor ilustrativo
+    # ----------------------------
+    # MODELO MILP con PuLP (DEMO)
+    # ----------------------------
+    prob = LpProblem("Hosp_Opt_PuLP", LpMinimize)
+
+    # Costos ajustados
+    c_act = {
+        'Medico_Especialista': costos_base['Medico_Especialista'] * f_esp,
+        'Medico_General': costos_base['Medico_General'] * f_gen,
+        'Interno_Rotativo': costos_base['Interno_Rotativo'] * f_int
+    }
+
+    # Variables
+    x = {(i, j): LpVariable(f"x_{i}_{j}", lowBound=0, cat=LpInteger)
+         for j in niveles for i in perfiles if i != 'Interno_Rotativo'}
+
+    y = {j: LpVariable(f"y_{j}", lowBound=0, cat=LpInteger) for j in niveles}
+
+    # Función objetivo
+    prob += (
+        lpSum(c_act[i] * x[(i, j)] for j in niveles for i in perfiles if i != 'Interno_Rotativo') +
+        lpSum(c_act['Interno_Rotativo'] * y[j] for j in niveles)
+    )
+
+    # Restricciones de cobertura
+    for j in niveles:
+        for i in perfiles:
+            d_ajust = demanda_base[j][i] * f_dem
+            if i != 'Interno_Rotativo':
+                prob += capacidad_base[i] * (planta[j][i] + x[(i, j)]) >= d_ajust
+            else:
+                prob += capacidad_base[i] * y[j] >= d_ajust
+
+        # Supervisión de internos
+        prob += y[j] <= alpha * lpSum(planta[j][i] + x[(i, j)]
+                                      for i in perfiles if i != 'Interno_Rotativo')
+
+    # Presupuesto
+    prob += value(prob.objective) <= presupuesto
+
+    # Resolver
+    prob.solve()
+
+    if prob.status != LpStatusOptimal:
+        return False, None, None, None
+
+    # Resultados
+    res = []
+    for j in niveles:
+        for i in perfiles:
+            if i != 'Interno_Rotativo':
+                ocasional = int(x[(i, j)].varValue)
+                planta_val = planta[j][i]
+            else:
+                ocasional = int(y[j].varValue)
+                planta_val = 0
+
             total = planta_val + ocasional
+            demanda = demanda_base[j][i] * f_dem
+            capacidad = total * capacidad_base[i]
 
-            capacidad = total * capacidad_base[perfil]
-            demanda = demanda_base[nivel][perfil] * f_dem
-
-            data.append({
-                'Nivel': nivel,
-                'Perfil': perfil,
+            res.append({
+                'Nivel': j,
+                'Perfil': i,
                 'Planta': planta_val,
                 'Ocasional': ocasional,
                 'Total': total,
                 'Capacidad': capacidad,
                 'Demanda': demanda,
-                'Cobertura_%': min(120, capacidad / demanda * 100),
-                'Costo_Ocasional': ocasional * costos_base[perfil]
+                'Cobertura_%': (capacidad / demanda) * 100,
+                'Costo_Ocasional': ocasional * c_act[i]
             })
 
-    df_res = pd.DataFrame(data)
+    df_res = pd.DataFrame(res)
 
     df_pie = pd.DataFrame({
         'Categoría': ['Especialistas Oc.', 'Generales Oc.', 'Internos Rot.'],
-        'Inversión': [600000, 400000, 120000]
+        'Inversión': [
+            df_res[df_res['Perfil'] == 'Medico_Especialista']['Costo_Ocasional'].sum(),
+            df_res[df_res['Perfil'] == 'Medico_General']['Costo_Ocasional'].sum(),
+            df_res[df_res['Perfil'] == 'Interno_Rotativo']['Costo_Ocasional'].sum()
+        ]
     })
 
-    costo_total = df_res['Costo_Ocasional'].sum()
+    costo_total = value(prob.objective)
     return True, costo_total, df_res, df_pie
+
 
 # --- 3. INTERFAZ ---
 # HEADER
