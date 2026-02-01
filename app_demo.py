@@ -485,12 +485,11 @@ st.divider()
 # Barra Lateral
 st.sidebar.header("🕹️ Controles de Sensibilidad")
 pres_val = st.sidebar.number_input(
-    "💰 Presupuesto Partida 51 - Personal (USD)", 
-    min_value=2500000,    # Mínimo 50 Millones (operación crítica)
-    max_value=120000000,   # Máximo 200 Millones (expansión total)
-    value=30000000,       # Valor referencial basado en 2019/2025
-    step=1000000,          # Saltos de 1 Millón para facilitar el ajuste
-    help="Presupuesto anual estimado para salarios, décimos y aportes patronales."
+    "💰 Presupuesto Nómina Médica (USD)", 
+    min_value=10000000,    # 10M (Para una red pequeña o un departamento)
+    max_value=60000000,    # 60M (Para toda la red de doctores del HCAM)
+    value=30000000,       # El valor más cercano a la realidad de 2019
+    step=1000000
 )
 f_dem = st.sidebar.slider("📈 Variación Demanda", 0.5, 2.0, 1.0, 0.1)
 alpha_val = st.sidebar.slider("👥 Ratio Alpha", 1, 10, 4)
