@@ -382,7 +382,7 @@ st.markdown("""
 <div class="modelo-card">
     <h1 style='text-align: center; margin-bottom: 0.5rem;'> Optimización de Personal en Hospitales Públicos de Ecuador</h1>
     <p style='text-align: center; font-size: 1.1rem; opacity: 0.95;'>
-        Modelo de Programación Lineal Entera Mixta (MILP) | Gurobi Optimizer
+        Modelo de Programación Lineal Entera | Gurobi Optimizer
     </p>
     <hr style='border: 1px solid rgba(255, 255, 255, 0.2); margin: 1.5rem 0;'>
     <div style='text-align: center;'>
@@ -422,22 +422,22 @@ with st.expander("📐 **VER MODELO MATEMÁTICO COMPLETO**", expanded=False):
         st.markdown("### 🔢 Parámetros")
         st.markdown("""
         <div class="parametro-card">
-        <strong>D<sub>ij</sub>:</strong> Demanda anual de atención (horas-médico) del perfil <em>i</em> en nivel <em>j</em>
+        <strong>D<sub>ij</sub>:</strong> Demanda anual de atención (horas-médico) del perfil <em>i ∈ I</em> en nivel <em>j ∈ J</em>.
         </div>
         <div class="parametro-card">
-        <strong>H<sub>i</sub>:</strong> Capacidad efectiva anual (horas-médico/año) del perfil <em>i</em>
+        <strong>H<sub>i</sub>:</strong> Capacidad efectiva anual (horas-médico/año) del perfil <em>i ∈ I</em>.
         </div>
         <div class="parametro-card">
-        <strong>C<sub>i</sub>:</strong> Costo anual integral de contratación del perfil <em>i</em> (Partida 51)
+        <strong>C<sub>i</sub>:</strong> Costo anual integral de contratación del perfil <em>i ∈ I</em> (Partida 51).
         </div>
         <div class="parametro-card">
-        <strong>B:</strong> Presupuesto anual disponible para gasto en personal
+        <strong>B:</strong> Presupuesto anual disponible para gasto en personal.
         </div>
         <div class="parametro-card">
-        <strong>P<sub>ij</sub>:</strong> Personal de planta existente (parámetro fijo)
+        <strong>P<sub>ij</sub>:</strong> Personal de planta existente (parámetro fijo).
         </div>
         <div class="parametro-card">
-        <strong>α:</strong> Ratio máximo de supervisión (internos por médico tutor)
+        <strong>α:</strong> Ratio máximo de supervisión (internos por médico tutor).
         </div>
         """, unsafe_allow_html=True)
     
